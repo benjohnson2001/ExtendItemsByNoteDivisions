@@ -1,0 +1,1 @@
+![extendItemsByNoteDivision](extendItemsByNoteDivision.gif)
