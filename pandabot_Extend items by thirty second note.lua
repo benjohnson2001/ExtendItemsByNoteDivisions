@@ -1,3 +1,5 @@
+-- @noindex
+
 local activeProjectIndex = 0
 
 function print(arg)
@@ -9,7 +11,7 @@ function startUndoBlock()
 end
 
 function endUndoBlock()
-	local actionDescription = "pandabot_Extend item by sixteenth note"
+	local actionDescription = "pandabot_Extend items by thirty second note"
 	reaper.Undo_OnStateChange(actionDescription)
 	reaper.Undo_EndBlock(actionDescription, -1)
 end
@@ -31,6 +33,10 @@ function lengthOfSixteenthNote()
 	return lengthOfEighthNote()/2
 end
 
+function lengthOfThirtySecondNote()
+	return lengthOfSixteenthNote()/2
+end
+
 startUndoBlock()
 
 	local numberOfSelectedItems = reaper.CountSelectedMediaItems(activeProjectIndex)
@@ -45,12 +51,13 @@ startUndoBlock()
 		local selectedItemTake = reaper.GetTake(selectedItem, takeIndex)
 		local selectedItemTakeStartOffset = reaper.GetMediaItemTakeInfo_Value(selectedItemTake, "D_STARTOFFS")
 
-		local noteLength = lengthOfSixteenthNote()
+		local noteLength = lengthOfThirtySecondNote()
 
 		if selectedItemPosition < noteLength then
 
 			reaper.SetMediaItemInfo_Value(selectedItem, "D_POSITION", selectedItemPosition-selectedItemPosition)
 			reaper.SetMediaItemInfo_Value(selectedItem, "D_LENGTH", selectedItemLength + selectedItemPosition + noteLength)
+			reaper.SetMediaItemInfo_Value(selectedItem, "D_SNAPOFFSET", selectedItemPosition)
 			reaper.SetMediaItemTakeInfo_Value(selectedItemTake, "D_STARTOFFS", selectedItemTakeStartOffset-selectedItemPosition)
 			
 			reaper.SetMediaItemInfo_Value(selectedItem, "D_FADEINLEN", selectedItemPosition)
@@ -60,6 +67,7 @@ startUndoBlock()
 
 			reaper.SetMediaItemInfo_Value(selectedItem, "D_POSITION", selectedItemPosition-noteLength)
 			reaper.SetMediaItemInfo_Value(selectedItem, "D_LENGTH", selectedItemLength + 2*noteLength)
+			reaper.SetMediaItemInfo_Value(selectedItem, "D_SNAPOFFSET", noteLength)
 			reaper.SetMediaItemTakeInfo_Value(selectedItemTake, "D_STARTOFFS", selectedItemTakeStartOffset-noteLength)
 
 			reaper.SetMediaItemInfo_Value(selectedItem, "D_FADEINLEN", noteLength)
